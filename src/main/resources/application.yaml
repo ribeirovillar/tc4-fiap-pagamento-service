@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: tc4-fiap-pagamento-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/paymentdb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+server:
+  port: ${SERVER_PORT:8085}

@@ -7,11 +7,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: paymentdb
     ports:
-      - "5435:5432"
+      - "5436:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - pagamento-network
+      - pgdata_pagamento:/var/lib/postgresql/data
 
   fiap-pagamento-service:
     build: .
@@ -27,4 +25,4 @@ services:
       - "8085:8080"
 
 volumes:
-  pgdata:
+  pgdata_pagamento:
