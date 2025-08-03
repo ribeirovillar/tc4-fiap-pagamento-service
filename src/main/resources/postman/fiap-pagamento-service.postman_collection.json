@@ -21,9 +21,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{url_base}}{{url_pagamento_port}}/payments",
+					"raw": "http://localhost:8085/payments",
 					"host": [
-						"{{url_base}}{{url_pagamento_port}}"
+						"http://localhost:8085"
 					],
 					"path": [
 						"payments"
@@ -38,9 +38,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url_base}}{{url_pagamento_port}}/payments",
+					"raw": "http://localhost:8085/payments",
 					"host": [
-						"{{url_base}}{{url_pagamento_port}}"
+						"http://localhost:8085"
 					],
 					"path": [
 						"payments"
