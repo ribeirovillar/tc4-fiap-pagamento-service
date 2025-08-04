@@ -2,10 +2,12 @@ package com.fiap.pagamento.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.pagamento.controller.json.PaymentDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureWebMvc
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 class PaymentIntegrationTest {
 
@@ -31,14 +34,13 @@ class PaymentIntegrationTest {
 
     private MockMvc mockMvc;
 
+    @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     void shouldCreateAndRetrievePayment() throws Exception {
-        setUp();
-
         PaymentDTO paymentDTO = new PaymentDTO();
         paymentDTO.setOrderId(UUID.randomUUID());
         paymentDTO.setCustomerName("John Doe");
@@ -61,8 +63,6 @@ class PaymentIntegrationTest {
 
     @Test
     void shouldRetrieveEmptyListInitially() throws Exception {
-        setUp();
-
         mockMvc.perform(get("/payments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());

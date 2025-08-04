@@ -66,6 +66,7 @@ class CreatePaymentUseCaseTest {
 
         doNothing().when(validationStrategy1).validate(payment);
         doNothing().when(validationStrategy2).validate(payment);
+        when(gateway.findByOrderId(payment.getOrderId())).thenReturn(Optional.empty());
         when(requestPaymentUseCase.execute(payment)).thenReturn(requestId);
         when(gateway.save(any(Payment.class))).thenReturn(Optional.of(savedPayment));
 
@@ -77,6 +78,7 @@ class CreatePaymentUseCaseTest {
         assertEquals(payment.getCustomerName(), result.getCustomerName());
         verify(validationStrategy1).validate(payment);
         verify(validationStrategy2).validate(payment);
+        verify(gateway).findByOrderId(payment.getOrderId());
         verify(requestPaymentUseCase).execute(payment);
         verify(gateway).save(any(Payment.class));
     }
@@ -87,6 +89,7 @@ class CreatePaymentUseCaseTest {
 
         doNothing().when(validationStrategy1).validate(payment);
         doNothing().when(validationStrategy2).validate(payment);
+        when(gateway.findByOrderId(payment.getOrderId())).thenReturn(Optional.empty());
         when(requestPaymentUseCase.execute(payment)).thenReturn(requestId);
         when(gateway.save(any(Payment.class))).thenReturn(Optional.empty());
 
@@ -96,6 +99,7 @@ class CreatePaymentUseCaseTest {
         assertEquals("Payment could not be saved", exception.getMessage());
         verify(validationStrategy1).validate(payment);
         verify(validationStrategy2).validate(payment);
+        verify(gateway).findByOrderId(payment.getOrderId());
         verify(requestPaymentUseCase).execute(payment);
         verify(gateway).save(any(Payment.class));
     }
@@ -108,14 +112,16 @@ class CreatePaymentUseCaseTest {
 
         doNothing().when(validationStrategy1).validate(payment);
         doNothing().when(validationStrategy2).validate(payment);
+        when(gateway.findByOrderId(payment.getOrderId())).thenReturn(Optional.empty());
         when(requestPaymentUseCase.execute(payment)).thenReturn(requestId);
         when(gateway.save(any(Payment.class))).thenReturn(Optional.of(savedPayment));
 
-        createPaymentUseCase.execute(payment);
+        Payment result = createPaymentUseCase.execute(payment);
 
-        assertEquals(requestId, payment.getId());
+        assertEquals(requestId, result.getId());
         verify(validationStrategy1).validate(payment);
         verify(validationStrategy2).validate(payment);
+        verify(gateway).findByOrderId(payment.getOrderId());
     }
 
     @Test
@@ -126,6 +132,7 @@ class CreatePaymentUseCaseTest {
 
         doNothing().when(validationStrategy1).validate(payment);
         doNothing().when(validationStrategy2).validate(payment);
+        when(gateway.findByOrderId(payment.getOrderId())).thenReturn(Optional.empty());
         when(requestPaymentUseCase.execute(payment)).thenReturn(requestId);
         when(gateway.save(any(Payment.class))).thenReturn(Optional.of(savedPayment));
 
@@ -133,5 +140,27 @@ class CreatePaymentUseCaseTest {
 
         verify(validationStrategy1, times(1)).validate(payment);
         verify(validationStrategy2, times(1)).validate(payment);
+    }
+
+    @Test
+    void shouldReturnExistingPaymentWhenAlreadyExists() {
+        Payment existingPayment = new Payment();
+        existingPayment.setId(UUID.randomUUID());
+        existingPayment.setOrderId(payment.getOrderId());
+
+        doNothing().when(validationStrategy1).validate(payment);
+        doNothing().when(validationStrategy2).validate(payment);
+        when(gateway.findByOrderId(payment.getOrderId())).thenReturn(Optional.of(existingPayment));
+
+        Payment result = createPaymentUseCase.execute(payment);
+
+        assertNotNull(result);
+        assertEquals(existingPayment.getId(), result.getId());
+        assertEquals(existingPayment.getOrderId(), result.getOrderId());
+        verify(validationStrategy1).validate(payment);
+        verify(validationStrategy2).validate(payment);
+        verify(gateway).findByOrderId(payment.getOrderId());
+        verify(requestPaymentUseCase, never()).execute(any());
+        verify(gateway, never()).save(any());
     }
 }
